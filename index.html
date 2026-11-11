@@ -53,6 +53,11 @@
           font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; white-space:pre-wrap; font-variant-numeric:tabular-nums; }
   details summary { cursor:pointer; font-size:13px; color:var(--dim); }
   details[open] summary { margin-bottom:10px; }
+  details.panel summary { font-size:12px; font-weight:600; color:var(--dim); text-transform:uppercase; letter-spacing:.09em; list-style:none; }
+  details.panel summary::after { content:" ▾"; opacity:.7; }
+  details.panel[open] summary::after { content:" ▴"; }
+  .sublbl { font-size:11px; font-weight:600; color:var(--dim); text-transform:uppercase; letter-spacing:.08em;
+            margin:12px 0 7px; padding-top:10px; border-top:1px solid var(--line); }
   .small { font-size:12px; color:var(--dim); margin:0; }
   .linkbtn { font:inherit; font-size:12px; color:var(--accent); background:none; border:0; padding:0; cursor:pointer; margin-top:10px; }
   [hidden] { display:none !important; }
@@ -69,7 +74,7 @@
       <canvas id="hud"></canvas>
       <div id="intro">
         <h2>X-RAY MIRROR</h2>
-        <p>See the skull, brain and muscles inside your own head, tracked live through your camera. Hold a hand up to see its bones.</p>
+        <p>See the skull, brain, muscles, and internal body organs (heart, lungs, liver, stomach, intestines, kidneys) inside yourself, tracked live through your camera. Hold a hand up to see its bones.</p>
         <button class="big" id="start">Start camera</button>
       </div>
     </div>
@@ -85,6 +90,8 @@
         <button data-preset="skull">Skull</button>
         <button data-preset="brain">Brain</button>
         <button data-preset="muscles">Muscles</button>
+        <button data-preset="organs">Body organs</button>
+        <button data-preset="chest">Chest</button>
         <button data-preset="all">Everything</button>
       </div>
       <div class="checks">
@@ -94,6 +101,16 @@
         <label class="ck"><input type="checkbox" id="L_eyes"><i style="background:#fff3a8"></i>Eyes</label>
         <label class="ck"><input type="checkbox" id="L_outline"><i style="background:#6fb6ff"></i>Head outline</label>
         <label class="ck"><input type="checkbox" id="L_hands"><i style="background:#d9f0ff"></i>Hand bones</label>
+      </div>
+      <div class="sublbl">Body &amp; internal organs</div>
+      <div class="checks" style="margin-top:0">
+        <label class="ck"><input type="checkbox" id="L_ribs"><i style="background:#b8dcff"></i>Ribs &amp; spine</label>
+        <label class="ck"><input type="checkbox" id="L_heart"><i style="background:#ff5978"></i>Heart</label>
+        <label class="ck"><input type="checkbox" id="L_lungs"><i style="background:#7de8ff"></i>Lungs &amp; airway</label>
+        <label class="ck"><input type="checkbox" id="L_digestive"><i style="background:#ffa96b"></i>Liver &amp; stomach</label>
+        <label class="ck"><input type="checkbox" id="L_intestines"><i style="background:#ffca8f"></i>Intestines</label>
+        <label class="ck"><input type="checkbox" id="L_kidneys"><i style="background:#d48cff"></i>Kidneys</label>
+        <label class="ck"><input type="checkbox" id="L_bodyOutline"><i style="background:#6fb6ff"></i>Body outline</label>
       </div>
       <div class="row" style="margin-top:13px;border-top:1px solid var(--line);padding-top:11px">
         <label class="ck" style="font-weight:600"><input type="checkbox" id="labels">Show labels</label>
@@ -116,11 +133,11 @@
       <div class="row">
         <label for="reveal">Reveal</label>
         <select id="reveal">
-          <option value="whole">Whole head</option>
+          <option value="whole">Whole body</option>
           <option value="left">Left half only</option>
           <option value="right">Right half only</option>
-          <option value="top">Top of the head only</option>
-          <option value="bottom">Lower face only</option>
+          <option value="top">Upper half only</option>
+          <option value="bottom">Lower half only</option>
           <option value="lens">X-ray lens (follows your fingertip)</option>
         </select>
       </div>
@@ -132,8 +149,17 @@
       <pre id="data" hidden></pre>
     </div>
 
-    <div class="panel">
-      <h3>Fit to my head</h3>
+    <details class="panel">
+      <summary>Fit to my body</summary>
+      <div class="row"><label for="bs">Body size <b id="bsv"></b></label><input id="bs" type="range" min="0.7" max="1.4" step="0.005"></div>
+      <div class="row"><label for="bw">Chest width <b id="bwv"></b></label><input id="bw" type="range" min="0.8" max="1.25" step="0.005"></div>
+      <div class="row"><label for="bh">Torso length <b id="bhv"></b></label><input id="bh" type="range" min="0.8" max="1.25" step="0.005"></div>
+      <div class="row"><label for="by">Up / down <b id="byv"></b></label><input id="by" type="range" min="-8" max="8" step="0.2"></div>
+      <button class="linkbtn" id="bodyfitreset" type="button">Reset body fit</button>
+    </details>
+
+    <details class="panel">
+      <summary>Fit to my head</summary>
       <div class="row"><label for="fs">Overall size <b id="fsv"></b></label><input id="fs" type="range" min="0.7" max="1.4" step="0.005"></div>
       <div class="row"><label for="fw">Width <b id="fwv"></b></label><input id="fw" type="range" min="0.8" max="1.25" step="0.005"></div>
       <div class="row"><label for="fh">Height <b id="fhv"></b></label><input id="fh" type="range" min="0.8" max="1.25" step="0.005"></div>
@@ -143,10 +169,10 @@
       <div class="row"><label for="fz">Forward / back <b id="fzv"></b></label><input id="fz" type="range" min="-4" max="4" step="0.1"></div>
       <button class="linkbtn" id="fitreset" type="button">Reset fit</button>
       <p class="small" style="margin-top:8px">Tip: pick the Solid look and set "Real me showing through" to about half, then line the skull up with your face.</p>
-    </div>
+    </details>
 
-    <p class="small">The anatomy is a real 3D dataset of one adult, scaled and pinned to your head. It shows where structures typically sit, not a scan of you, and it is not a medical tool. Video is processed on this computer and never uploaded.</p>
-    <p class="small">Anatomy models: BodyParts3D, © The Database Center for Life Science, licensed under CC Attribution-Share Alike 2.1 Japan. Models were simplified and re-aligned.</p>
+    <p class="small">The anatomy shows typical adult structures scaled and pinned to your head and body, not a medical scan of you, and is not a medical tool. Video is processed on this computer and never uploaded.</p>
+    <p class="small">Head &amp; hand models: BodyParts3D, © The Database Center for Life Science, CC Attribution-Share Alike 2.1 Japan (simplified and re-aligned). Internal body organs are procedural 3D anatomical meshes.</p>
   </aside>
 </div>
 
@@ -163,24 +189,31 @@ const MP = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 const MODELS = "https://storage.googleapis.com/mediapipe-models/";
 const FACE_MODEL = MODELS + "face_landmarker/face_landmarker/float16/1/face_landmarker.task";
 const HAND_MODEL = MODELS + "hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+const POSE_MODEL = MODELS + "pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
 const META = JSON.parse($("meshmeta").textContent);
 
 // ------------------------------ settings ------------------------------
-const DEFAULTS = { skull: true, brain: false, muscles: false, eyes: true, outline: true, hands: true,
-                   style: "xray", bright: 1, real: 0.12, feather: 0.2, reveal: "whole", cut: 0.5, showdata: false,
-                   fs: 1, fw: 1, fh: 1, fd: 1, fx: 0, fy: 0, fz: 0, labels: false };
+const HEAD_LAYERS = ["skull", "brain", "muscles", "eyes", "outline"];
+const TORSO_LAYERS = ["ribs", "heart", "lungs", "digestive", "intestines", "kidneys", "bodyOutline"];
+const LAYERS = [...HEAD_LAYERS, "hands", ...TORSO_LAYERS];
+const DEFAULTS = {
+  skull: true, brain: false, muscles: false, eyes: true, outline: true, hands: true,
+  ribs: true, heart: true, lungs: true, digestive: true, intestines: true, kidneys: true, bodyOutline: true,
+  style: "xray", bright: 1, real: 0.12, feather: 0.2, reveal: "whole", cut: 0.5, showdata: false,
+  fs: 1, fw: 1, fh: 1, fd: 1, fx: 0, fy: 0, fz: 0,
+  bs: 1, bw: 1, bh: 1, by: 0, labels: false
+};
 let S = Object.assign({}, DEFAULTS);
 try { Object.assign(S, JSON.parse(localStorage.getItem("xr_settings") || "{}")); } catch (e) {}
 function save() { try { localStorage.setItem("xr_settings", JSON.stringify(S)); } catch (e) {} }
-const LAYERS = ["skull", "brain", "muscles", "eyes", "outline", "hands"];
-const SLIDERS = ["bright", "real", "feather", "cut", "fs", "fw", "fh", "fd", "fx", "fy", "fz"];
+const SLIDERS = ["bright", "real", "feather", "cut", "fs", "fw", "fh", "fd", "fx", "fy", "fz", "bs", "bw", "bh", "by"];
 
 function syncUI() {
   for (const k of LAYERS) $("L_" + k).checked = S[k];
   for (const b of $("style").children) b.classList.toggle("on", b.dataset.style === S.style);
   for (const k of SLIDERS) $(k).value = S[k];
-  for (const k of ["fs", "fw", "fh", "fd"]) $(k + "v").textContent = Math.round(S[k] * 100) + "%";
-  for (const k of ["fx", "fy", "fz"]) $(k + "v").textContent = (S[k] > 0 ? "+" : "") + S[k].toFixed(1) + " cm";
+  for (const k of ["fs", "fw", "fh", "fd", "bs", "bw", "bh"]) $(k + "v").textContent = Math.round(S[k] * 100) + "%";
+  for (const k of ["fx", "fy", "fz", "by"]) $(k + "v").textContent = (S[k] > 0 ? "+" : "") + S[k].toFixed(1) + " cm";
   $("featherv").textContent = Math.round(S.feather * 100) + "%";
   $("labels").checked = S.labels;
   $("reveal").value = S.reveal; $("showdata").checked = S.showdata; $("data").hidden = !S.showdata;
@@ -194,18 +227,31 @@ $("labels").onchange = e => { S.labels = e.target.checked; save(); };
 $("reveal").onchange = e => { S.reveal = e.target.value; S.cut = 0.5; save(); syncUI(); };
 $("showdata").onchange = e => { S.showdata = e.target.checked; save(); syncUI(); };
 $("fitreset").onclick = () => { S.fs = S.fw = S.fh = S.fd = 1; S.fx = S.fy = S.fz = 0; save(); syncUI(); };
+$("bodyfitreset").onclick = () => { S.bs = S.bw = S.bh = 1; S.by = 0; save(); syncUI(); };
 for (const b of document.querySelectorAll("[data-preset]")) b.onclick = () => {
   const p = b.dataset.preset;
-  S.skull = p === "skull" || p === "all"; S.brain = p === "brain" || p === "all";
-  S.muscles = p === "muscles" || p === "all"; S.eyes = p !== "brain"; S.outline = true;
+  if (p === "organs" || p === "chest") {
+    for (const k of HEAD_LAYERS) S[k] = false;
+    S.ribs = true; S.heart = true; S.lungs = true; S.bodyOutline = true;
+    S.digestive = p === "organs"; S.intestines = p === "organs"; S.kidneys = p === "organs";
+  } else {
+    S.skull = p === "skull" || p === "all"; S.brain = p === "brain" || p === "all";
+    S.muscles = p === "muscles" || p === "all"; S.eyes = p !== "brain"; S.outline = true;
+    const onAll = p === "all";
+    for (const k of TORSO_LAYERS) S[k] = onAll;
+    if (onAll) S.hands = true;
+  }
   save(); syncUI();
 };
 syncUI();
 
 // ------------------------------ 3D scene ------------------------------
-let THREE, renderer, headScene, handScene, cam, ortho, headGroup, jawPivot, baseProj;
+let THREE, renderer, headScene, torsoScene, handScene, cam, torsoCam, ortho, headGroup, torsoGroup, jawPivot, baseProj;
+let heartPivot, breathGroup, torsoPivotMap = {};
 let W = 640, H = 480;
-const meshes = {};                 // name -> { mesh, layer, xray color, solid color }
+const meshes = {};                 // name -> { mesh, layer, fixedMode }
+const torsoMeshes = {};            // name -> { mesh, layer, fixedMode, pivot }
+const torsoLabels = [];            // [{ t, layer, pts }]
 const handRigs = [];               // two hands, each: { group, palm, bones[] }
 const BONES = [[1,2],[2,3],[3,4],[5,6],[6,7],[7,8],[9,10],[10,11],[11,12],[13,14],[14,15],[15,16],[17,18],[18,19],[19,20]];
 
@@ -233,8 +279,10 @@ void main() {
   vec3 n = normalize(vN);
   float ndv = abs(dot(n, normalize(vV)));
   if (uFeather > 0.001) soft *= smoothstep(0.0, uFeather, ndv);   // surfaces turning away at the outline fade out
-  float fade = uFade > 0.5 ? smoothstep(-12.4, -9.2, vL.y) : 1.0;   // the neck fades out instead of ending in a hard edge
-  if (uMode > 1.5) {                                   // flat veil that hides the real face
+  float fade = 1.0;
+  if (uFade > 1.5) fade = smoothstep(-41.0, -32.0, vL.y) * (1.0 - smoothstep(1.5, 5.2, vL.y));
+  else if (uFade > 0.5) fade = smoothstep(-12.4, -9.2, vL.y);     // the neck fades out instead of ending in a hard edge
+  if (uMode > 1.5) {                                   // flat veil that hides the real face/body
     gl_FragColor = vec4(uColor, uOpacity * fade * soft);
   } else if (uMode > 0.5) {                            // solid, lit
     vec3 fn = gl_FrontFacing ? n : -n;
@@ -279,9 +327,10 @@ function buildScene() {
   renderer = new THREE.WebGLRenderer({ canvas: $("gl"), alpha: true, antialias: true });
   renderer.setClearColor(0x000000, 0);
   renderer.autoClear = false;
-  headScene = new THREE.Scene(); handScene = new THREE.Scene();
+  headScene = new THREE.Scene(); torsoScene = new THREE.Scene(); handScene = new THREE.Scene();
   // MediaPipe places the face for a camera with a 63 degree vertical field of view.
   cam = new THREE.PerspectiveCamera(63, W / H, 1, 10000);
+  torsoCam = new THREE.PerspectiveCamera(63, W / H, 1, 10000);
   ortho = new THREE.OrthographicCamera(0, W, H, 0, -5000, 5000);
   const geos = decodeMeshes();
 
@@ -305,6 +354,8 @@ function buildScene() {
   add("cerebrum", geos.cerebrum, "brain", 0xff9fc0, 0xe2a39d, 5);
   add("hindbrain", geos.hindbrain, "brain", 0xffc37a, 0xd6ad84, 5);
 
+  buildTorsoScene();
+
   for (let h = 0; h < 2; h++) {
     const group = new THREE.Group(); group.visible = false; handScene.add(group);
     const mk = geo => { const m = new THREE.Mesh(geo, makeMat(0xd9f0ff, 0xe9e2cf)); m.material.uniforms.uOrtho.value = 1;
@@ -317,6 +368,7 @@ function buildScene() {
 
 function eachMat(fn) {
   for (const k in meshes) fn(meshes[k].mesh.material, meshes[k]);
+  for (const k in torsoMeshes) fn(torsoMeshes[k].mesh.material, torsoMeshes[k]);
   for (const r of handRigs) { fn(r.palm.material, { layer: "hands" }); for (const b of r.bones) fn(b.material, { layer: "hands" }); }
 }
 function applyStyle() {
@@ -337,6 +389,7 @@ function resize() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(W, H, false);
     cam.aspect = W / H; cam.updateProjectionMatrix(); baseProj = cam.projectionMatrix.clone();
+    torsoCam.aspect = W / H; torsoCam.updateProjectionMatrix();
     ortho.right = W; ortho.top = H; ortho.updateProjectionMatrix();
   }
   for (const id of ["shade", "hud"]) { const c = $(id); c.width = W; c.height = H; }
@@ -395,30 +448,473 @@ function updateHead(matrixData, lms, jawOpen) {
 }
 
 const clipState = { on: 0, x: 1, y: 0, w: 0 };
+const torsoClipState = { on: 0, x: 1, y: 0, w: 0 };
 let jawM = null;
-const XRAY_GAIN = { outline: 0.55, muscles: 0.5, cerebrum: 0.36, hindbrain: 0.6, eyes: 0.9 };
+const XRAY_GAIN = {
+  outline: 0.55, muscles: 0.5, cerebrum: 0.36, hindbrain: 0.6, eyes: 0.9,
+  torsoOutline: 0.52, ribs: 0.58, lungs: 0.58, airway: 0.95, heart: 1.05,
+  vessels: 0.85, liver: 0.92, gallbladder: 0.95, stomach: 0.92,
+  colon: 0.82, smallIntestine: 0.68, kidneys: 0.95, spleen: 0.85
+};
 function applyLayers() {
   const reveal = S.reveal;
   let clipOn = 0, cx = 1, cy = 0, cz = 0, cw = 0;
-  if (reveal === "left")   { clipOn = 1; cx = 1;  cy = 0; cw = (S.cut - 0.5) * 16; }      // your left = +x
-  if (reveal === "right")  { clipOn = 1; cx = -1; cy = 0; cw = (S.cut - 0.5) * 16; }
-  if (reveal === "top")    { clipOn = 1; cx = 0; cy = 1;  cw = -9 + (1 - S.cut) * 22; }
-  if (reveal === "bottom") { clipOn = 1; cx = 0; cy = -1; cw = -(-9 + S.cut * 22); }
+  let tClipOn = 0, tcx = 1, tcy = 0, tcw = 0;
+  if (reveal === "left")   { clipOn = 1; cx = 1;  cy = 0; cw = (S.cut - 0.5) * 16; tClipOn = 1; tcx = 1;  tcy = 0; tcw = (S.cut - 0.5) * 32; }
+  if (reveal === "right")  { clipOn = 1; cx = -1; cy = 0; cw = (S.cut - 0.5) * 16; tClipOn = 1; tcx = -1; tcy = 0; tcw = (S.cut - 0.5) * 32; }
+  if (reveal === "top")    { clipOn = 1; cx = 0; cy = 1;  cw = -9 + (1 - S.cut) * 22; tClipOn = 1; tcx = 0; tcy = 1;  tcw = -40 + (1 - S.cut) * 44; }
+  if (reveal === "bottom") { clipOn = 1; cx = 0; cy = -1; cw = -(-9 + S.cut * 22);     tClipOn = 1; tcx = 0; tcy = -1; tcw = -(-40 + S.cut * 44); }
   clipState.on = clipOn; clipState.x = cx; clipState.y = cy; clipState.w = cw;
+  torsoClipState.on = tClipOn; torsoClipState.x = tcx; torsoClipState.y = tcy; torsoClipState.w = tcw;
+
   jawPivot.updateMatrix(); meshes.jaw.mesh.updateMatrix();
   jawM.copy(jawPivot.matrix).multiply(meshes.jaw.mesh.matrix);
+  const anyHead = S.skull || S.brain || S.muscles || S.eyes || S.outline;
   const heavy = (S.skull ? 1 : 0) + (S.brain ? 1 : 0) + (S.muscles ? 1 : 0);
   const share = 1 / (0.4 + 0.6 * Math.max(1, heavy));        // several glowing layers at once would wash out to white
   for (const k in meshes) {
     const { mesh, layer } = meshes[k], u = mesh.material.uniforms;
-    mesh.visible = layer === "veil" ? true : !!S[layer];
-    // x-ray light adds up, so layers with many overlapping surfaces get a lower share
+    mesh.visible = layer === "veil" ? anyHead : !!S[layer];
     u.uGain.value = (S.style === "solid" && k !== "outline") ? Math.min(1.25, 0.6 + 0.4 * S.bright) : S.bright * (XRAY_GAIN[k] || 1) * (layer === "outline" ? 1 : share);
     u.uOpacity.value = layer === "veil" ? 1 - S.real : 1;
     u.uClipOn.value = clipOn; u.uClip.value.set(cx, cy, cz, cw);
-    u.uFeather.value = S.feather * 0.75; u.uCutSoft.value = S.feather * 5;   // outline softness, and up to 5 cm of fade at a cut
+    u.uFeather.value = S.feather * 0.75; u.uCutSoft.value = S.feather * 5;
     if (k === "jaw") u.uToHead.value.copy(jawPivot.matrix).multiply(mesh.matrix); else u.uToHead.value.identity();
   }
+
+  const tHeavy = (S.ribs ? 1 : 0) + (S.heart ? 1 : 0) + (S.lungs ? 1 : 0) + (S.digestive ? 1 : 0) + (S.intestines ? 1 : 0) + (S.kidneys ? 1 : 0);
+  const tShare = 1 / (0.35 + 0.25 * Math.max(1, tHeavy));
+  if (heartPivot) heartPivot.updateMatrix();
+  if (breathGroup) breathGroup.updateMatrix();
+  for (const k in torsoMeshes) {
+    const { mesh, layer, pivot } = torsoMeshes[k], u = mesh.material.uniforms;
+    mesh.visible = layer === "torsoVeil" ? tHeavy > 0 || S.bodyOutline : !!S[layer];
+    u.uGain.value = (S.style === "solid" && k !== "torsoOutline") ? Math.min(1.25, 0.6 + 0.4 * S.bright) : S.bright * (XRAY_GAIN[k] || 1) * (layer === "bodyOutline" ? 1 : tShare);
+    u.uOpacity.value = layer === "torsoVeil" ? (1 - S.real) * 0.94 : 1;
+    u.uClipOn.value = tClipOn; u.uClip.value.set(tcx, tcy, 0, tcw);
+    u.uFeather.value = layer === "torsoVeil" ? Math.max(0.32, S.feather * 0.75) : S.feather * 0.75;
+    u.uCutSoft.value = S.feather * 6;
+    if (pivot) { mesh.updateMatrix(); u.uToHead.value.copy(pivot.matrix).multiply(mesh.matrix); }
+    else u.uToHead.value.identity();
+  }
+}
+
+// ------------------------------ body & organs ------------------------------
+function mergeGeos(list) {
+  let nv = 0, ni = 0;
+  for (const g of list) { nv += g.getAttribute("position").count; ni += g.index ? g.index.count : g.getAttribute("position").count; }
+  const pos = new Float32Array(nv * 3);
+  const idx = nv > 65535 ? new Uint32Array(ni) : new Uint16Array(ni);
+  let vo = 0, io = 0;
+  for (const g of list) {
+    const p = g.getAttribute("position").array;
+    pos.set(p, vo * 3);
+    if (g.index) {
+      const ix = g.index.array;
+      for (let i = 0; i < ix.length; i++) idx[io + i] = ix[i] + vo;
+      io += ix.length;
+    } else {
+      const c = g.getAttribute("position").count;
+      for (let i = 0; i < c; i++) idx[io + i] = vo + i;
+      io += c;
+    }
+    vo += g.getAttribute("position").count;
+    g.dispose();
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  out.setIndex(new THREE.BufferAttribute(idx, 1));
+  out.computeVertexNormals();
+  return out;
+}
+
+function buildTube(pts, radFn, segU = 28, segV = 10, cap = true) {
+  const curve = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(p[0], p[1], p[2])));
+  const P = [], T = [];
+  for (let i = 0; i <= segU; i++) {
+    const u = i / segU;
+    P.push(curve.getPoint(u));
+    T.push(curve.getTangent(u).normalize());
+  }
+  const up = Math.abs(T[0].y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+  const N = up.clone().addScaledVector(T[0], -up.dot(T[0])).normalize();
+  const B = new THREE.Vector3().crossVectors(T[0], N).normalize();
+  const verts = [], idx = [], stride = segV + 1;
+  for (let i = 0; i <= segU; i++) {
+    if (i > 0) {
+      N.addScaledVector(T[i], -N.dot(T[i]));
+      if (N.lengthSq() < 1e-8) {
+        const fb = Math.abs(T[i].y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+        N.copy(fb).addScaledVector(T[i], -fb.dot(T[i]));
+      }
+      N.normalize(); B.crossVectors(T[i], N).normalize();
+    }
+    const u = i / segU;
+    for (let j = 0; j <= segV; j++) {
+      const th = j / segV * Math.PI * 2;
+      const r = typeof radFn === "function" ? radFn(u, th) : radFn;
+      const rN = Array.isArray(r) ? r[0] : r, rB = Array.isArray(r) ? r[1] : r;
+      const c = Math.cos(th) * rN, s = Math.sin(th) * rB;
+      verts.push(P[i].x + N.x * c + B.x * s, P[i].y + N.y * c + B.y * s, P[i].z + N.z * c + B.z * s);
+    }
+  }
+  for (let i = 0; i < segU; i++) {
+    for (let j = 0; j < segV; j++) {
+      const a = i * stride + j, b = a + 1, d = a + stride, c = d + 1;
+      idx.push(a, d, b, b, d, c);
+    }
+  }
+  if (cap) {
+    const c0 = verts.length / 3; verts.push(P[0].x, P[0].y, P[0].z);
+    const c1 = verts.length / 3; verts.push(P[segU].x, P[segU].y, P[segU].z);
+    for (let j = 0; j < segV; j++) {
+      idx.push(c0, j, j + 1);
+      const off = segU * stride;
+      idx.push(c1, off + j + 1, off + j);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+
+function buildSurf(segU, segV, fn) {
+  const verts = [], idx = [], stride = segU + 1;
+  for (let i = 0; i <= segV; i++) {
+    const v = i / segV * Math.PI;
+    for (let j = 0; j <= segU; j++) {
+      const p = fn(j / segU, v);
+      verts.push(p[0], p[1], p[2]);
+    }
+  }
+  for (let i = 0; i < segV; i++) {
+    for (let j = 0; j < segU; j++) {
+      const a = i * stride + j, b = a + 1, d = a + stride, c = d + 1;
+      idx.push(a, d, b, b, d, c);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+
+function buildTorsoScene() {
+  torsoGroup = new THREE.Group(); torsoGroup.matrixAutoUpdate = false; torsoGroup.visible = false;
+  torsoScene.add(torsoGroup);
+  breathGroup = new THREE.Group(); breathGroup.position.set(0, -8, 0); torsoGroup.add(breathGroup);
+  heartPivot = new THREE.Group(); heartPivot.position.set(2.2, -10.8, 2.6); torsoGroup.add(heartPivot);
+
+  const addT = (name, geo, layer, xray, solid, order, parent, mode, pivot) => {
+    const mesh = new THREE.Mesh(geo, makeMat(xray, solid, mode));
+    mesh.renderOrder = order; mesh.frustumCulled = false;
+    (parent || torsoGroup).add(mesh);
+    torsoMeshes[name] = { mesh, layer, fixedMode: mode, pivot: pivot || null };
+    return mesh;
+  };
+
+  // 1. Torso shell (veil + glowing body outline with natural trapezius-to-shoulder slope)
+  const stations = [
+    [0.00, 5.8, 5.2, 5.4], [0.06, 8.6, 6.2, 6.2], [0.13, 15.6, 7.2, 7.0],
+    [0.20, 18.8, 8.4, 7.6], [0.38, 16.0, 10.2, 8.2], [0.64, 13.4, 9.2, 7.4],
+    [0.85, 14.4, 9.5, 7.8], [1.00, 15.2, 9.2, 8.2]
+  ];
+  const shellGeo = buildSurf(36, 32, (u, v) => {
+    const t = v / Math.PI, y = 5.0 - 46.0 * t;
+    let k = 0; while (k + 1 < stations.length - 1 && t > stations[k + 1][0]) k++;
+    const s0 = stations[k], s1 = stations[k + 1];
+    const f = Math.max(0, Math.min(1, (t - s0[0]) / (s1[0] - s0[0])));
+    const s = f * f * (3 - 2 * f);
+    const rx = s0[1] + (s1[1] - s0[1]) * s, rzF = s0[2] + (s1[2] - s0[2]) * s, rzB = s0[3] + (s1[3] - s0[3]) * s;
+    const th = u * Math.PI * 2, x = rx * Math.cos(th), sinT = Math.sin(th);
+    let z = (sinT >= 0 ? rzF : rzB) * sinT;
+    if (sinT < 0) z += 1.1 * Math.exp(-x * x / 10);
+    return [x, y, z];
+  });
+  addT("torsoVeil", shellGeo, "torsoVeil", 0x04070d, 0x04070d, -10, null, 2).material.uniforms.uFade.value = 2;
+  addT("torsoOutline", shellGeo, "bodyOutline", 0x6fb6ff, 0x6fb6ff, 1, null, 0).material.uniforms.uFade.value = 2;
+
+  // 2. Ribcage, clavicles, sternum & thoracic/lumbar spine
+  const skelParts = [];
+  for (const s of [-1, 1]) {
+    skelParts.push(buildTube([[s * 1.4, 1.0, 5.1], [s * 6.2, 1.5, 5.5], [s * 11.4, 0.8, 2.7], [s * 15.0, 0.3, 0.4]],
+      u => [0.58 - 0.10 * Math.sin(u * Math.PI), 0.48], 16, 8));
+  }
+  skelParts.push(buildTube([[0, 1.4, 5.2], [0, -2.5, 6.5], [0, -8.5, 7.6], [0, -13.8, 7.1], [0, -16.0, 6.5]],
+    u => [u < 0.25 ? 2.2 - 2.0 * u : u < 0.85 ? 1.55 : 1.55 - (u - 0.85) * 7.5, 0.52], 16, 8));
+  for (let i = 0; i < 12; i++) {
+    const f = i / 11, yP = 1.0 - i * 1.9, zP = -5.8 - 1.6 * Math.sin(f * Math.PI);
+    const rx = i < 7 ? 7.6 + 7.2 * Math.sin((i + 0.5) / 7.5 * Math.PI * 0.65) : 14.6 - (i - 6) * 1.05;
+    const zF = 6.0 + 1.5 * Math.sin(Math.min(1, i / 7) * Math.PI * 0.6);
+    for (const s of [-1, 1]) {
+      let pts;
+      if (i < 7) {
+        const yA = yP - 2.3 - i * 0.35;
+        pts = [[s * 1.4, yP, zP], [s * rx * 0.68, yP - 0.8, zP + 1.2], [s * rx, yP - 2.2, 0.2], [s * rx * 0.68, yA + 0.4, zF * 0.72], [s * 1.5, yA, zF]];
+      } else if (i < 10) {
+        const k = i - 7;
+        pts = [[s * 1.4, yP, zP], [s * rx * 0.7, yP - 1.0, zP + 1.2], [s * rx, yP - 2.8, 0.0], [s * (rx * 0.72), yP - 3.6, zF * 0.62], [s * (3.2 + k * 2.1), -14.8 - k * 1.2, 6.6 - k * 0.5]];
+      } else {
+        const k = i - 10;
+        pts = [[s * 1.4, yP, zP], [s * rx * 0.68, yP - 1.2, zP + 1.0], [s * (rx * (0.85 - k * 0.14)), yP - 3.0, -0.8 - k * 1.8]];
+      }
+      skelParts.push(buildTube(pts, [0.30, 0.56], 18, 7));
+    }
+  }
+  for (let v = 0; v < 17; v++) {
+    const f = v / 16, y = 1.2 - v * 2.1, z = -5.6 - 1.8 * Math.sin(f * Math.PI) + 2.4 * Math.max(0, f - 0.6);
+    const r = 1.65 + 0.72 * f;
+    skelParts.push(buildTube([[0, y + 0.75, z], [0, y - 0.75, z]], r, 4, 10));
+    skelParts.push(buildTube([[0, y + 0.2, z - r * 0.7], [0, y - 0.8, z - r - 1.8]], [0.36, 0.55], 4, 6));
+    skelParts.push(buildTube([[-r - 1.2, y + 0.1, z - 0.6], [0, y + 0.1, z - 0.6], [r + 1.2, y + 0.1, z - 0.6]], 0.36, 6, 6));
+  }
+  const ribsMesh = addT("ribs", mergeGeos(skelParts), "ribs", 0xb8dcff, 0xe8e1cf, 3, breathGroup, undefined, breathGroup);
+  ribsMesh.position.set(0, 8, 0);
+
+  // 3. Lungs & Trachea/Bronchial Tree
+  const makeLung = (side) => buildSurf(32, 26, (u, v) => {
+    const t = v / Math.PI, env = Math.pow(Math.sin(v), 0.72) * (0.55 + 0.55 * t);
+    const th = u * Math.PI * 2, ct = Math.cos(th), st = Math.sin(th);
+    let rx = (side < 0 ? 5.6 : 5.0) * env, rz = 6.7 * env;
+    let x = side * (6.8 + 1.0 * Math.sin(t * Math.PI)) + rx * ct;
+    let z = 0.4 + rz * st;
+    let y = 1.4 - 19.0 * t;
+    // Flat medial wall facing mediastinum
+    if (side < 0 && x > -2.3) x = -2.3 - (x + 2.3) * 0.15;
+    if (side > 0 && x < 2.3) x = 2.3 - (2.3 - x) * 0.15;
+    // Diaphragmatic concavity at base
+    if (t > 0.72) {
+      const bf = (t - 0.72) / 0.28;
+      y += 2.6 * bf * bf * (1 - 0.55 * Math.abs(ct));
+    }
+    // Left lung cardiac notch carving around heart
+    if (side > 0) {
+      const notch = Math.exp(-((y + 11.2) * (y + 11.2) / 22 + (x - 2.6) * (x - 2.6) / 14 + (z - 2.6) * (z - 2.6) / 22));
+      x += notch * 3.1;
+    }
+    // Oblique fissure crease
+    const fis = Math.exp(-Math.pow((t - 0.56 - 0.18 * st) / 0.045, 2));
+    x -= side * fis * 0.35 * env; z -= fis * 0.25 * env;
+    return [x, y, z];
+  });
+  const lungsMesh = addT("lungs", mergeGeos([makeLung(-1), makeLung(1)]), "lungs", 0x6ee7ff, 0xc98a96, 4, breathGroup, undefined, breathGroup);
+  lungsMesh.position.set(0, 8, 0);
+
+  const airwayParts = [
+    buildTube([[0, 3.0, 1.5], [0, 0.5, 1.6], [0, -3.5, 1.5], [0, -7.2, 1.2]], u => 1.05 * (1 + 0.08 * Math.sin(u * Math.PI * 24)), 22, 10),
+    buildTube([[0, -7.0, 1.2], [-3.8, -8.8, 0.9], [-7.4, -10.5, 0.5], [-9.6, -14.2, -0.8]], u => 0.82 * (1 - 0.55 * u), 16, 8),
+    buildTube([[-3.8, -8.8, 0.9], [-6.8, -6.2, 0.8], [-9.0, -4.4, 0.4]], u => 0.52 * (1 - 0.5 * u), 10, 7),
+    buildTube([[-5.5, -9.6, 0.7], [-8.4, -11.4, 2.8]], u => 0.48 * (1 - 0.5 * u), 8, 7),
+    buildTube([[0, -7.0, 1.2], [4.4, -9.1, 0.8], [8.2, -10.8, 0.2], [10.0, -14.6, -0.9]], u => 0.78 * (1 - 0.55 * u), 16, 8),
+    buildTube([[4.8, -9.3, 0.7], [8.0, -5.8, 0.8], [9.4, -3.8, 0.3]], u => 0.50 * (1 - 0.5 * u), 10, 7),
+    buildTube([[7.6, -10.6, 0.3], [9.3, -13.0, 2.5]], u => 0.45 * (1 - 0.5 * u), 8, 7)
+  ];
+  const airwayMesh = addT("airway", mergeGeos(airwayParts), "lungs", 0xc2f6ff, 0xdfd5cc, 5, breathGroup, undefined, breathGroup);
+  airwayMesh.position.set(0, 8, 0);
+
+  // 4. Heart (animated around heartPivot) & Great Vessels
+  const heartGeo = buildSurf(32, 26, (u, v) => {
+    const t = v / Math.PI, th = u * Math.PI * 2, st = Math.sin(v);
+    const taper = 1.0 - 0.48 * Math.pow(t, 1.45);
+    const rx = 3.7 * st * taper, ry = 4.9, rz = 3.3 * st * taper;
+    let x = rx * Math.cos(th), y = ry * Math.cos(v), z = rz * Math.sin(th);
+    // Tilt apex down-left-forward and add interventricular groove
+    const nx = x * 0.86 - y * 0.44 + t * 1.4, ny = x * 0.44 + y * 0.86, nz = z + t * 1.3 * Math.sin(v);
+    const groove = Math.exp(-Math.pow((x - 0.3) / 0.8, 2)) * (z > 0 ? 0.38 : 0.2) * st;
+    return [nx, ny, nz - groove * Math.sign(nz || 1)];
+  });
+  addT("heart", heartGeo, "heart", 0xff5978, 0xb83042, 6, heartPivot, undefined, heartPivot);
+
+  const vesselParts = [
+    // Aortic arch + descending thoracic/abdominal aorta
+    buildTube([[1.6, -8.5, 2.4], [1.2, -5.0, 2.5], [2.6, -3.8, 0.9], [3.3, -6.2, -1.8], [2.0, -13.0, -3.5], [0.7, -23.5, -3.4], [0.4, -33.0, -3.0]],
+      u => 1.32 - 0.38 * u, 30, 9),
+    // Arch branches (brachiocephalic, left carotid, left subclavian)
+    buildTube([[1.2, -4.4, 2.0], [0.2, -1.2, 1.8], [-1.2, 1.8, 1.2]], 0.42, 8, 7),
+    buildTube([[2.0, -3.9, 1.4], [1.8, 1.8, 1.3]], 0.34, 8, 7),
+    buildTube([[2.8, -4.3, 0.3], [3.5, 1.5, 0.4]], 0.34, 8, 7),
+    // Superior vena cava + brachiocephalic veins
+    buildTube([[-1.6, -8.8, 2.0], [-2.0, -4.4, 1.8], [-2.7, -0.5, 1.2], [-5.4, 1.4, 0.7]], u => 0.95 - 0.38 * u, 14, 8),
+    buildTube([[-2.4, -1.5, 1.4], [1.4, 1.1, 1.2]], 0.52, 8, 7),
+    // Pulmonary trunk + left/right pulmonary arteries
+    buildTube([[1.7, -9.2, 3.8], [2.4, -7.2, 2.9], [1.9, -6.8, 1.4]], 0.85, 10, 8),
+    buildTube([[1.9, -6.8, 1.4], [-4.4, -8.0, 0.5]], 0.58, 8, 7),
+    buildTube([[1.9, -6.8, 1.4], [6.2, -7.8, 0.3]], 0.58, 8, 7)
+  ];
+  addT("vessels", mergeGeos(vesselParts), "heart", 0xff7a96, 0x9c2c4a, 5);
+
+  // 5. Liver, Gallbladder & Stomach
+  const liverGeo = buildSurf(34, 24, (u, v) => {
+    const th = u * Math.PI * 2, ct = Math.cos(th), st = Math.sin(th), sv = Math.sin(v), cv = Math.cos(v);
+    // Horizontal span: right lobe (-11.6) across to left tip (+5.0)
+    const x = -3.3 + 8.3 * sv * ct;
+    const rightness = Math.max(0, Math.min(1, (-x + 5.0) / 16.6));
+    const h = 1.4 + 3.6 * Math.pow(rightness, 0.75);
+    const yMid = -18.2 - 1.6 * rightness;
+    let y = yMid + h * cv;
+    if (cv < 0) y += (1 - rightness) * 1.1 * (-cv);      // angled inferior visceral border
+    const rz = 2.0 + 3.2 * Math.pow(rightness, 0.7);
+    let z = 1.6 + rz * sv * st;
+    if (st > 0) z -= 0.45 * Math.exp(-Math.pow((x + 1.0) / 0.9, 2)) * sv; // falciform indentation
+    return [x, y, z];
+  });
+  addT("liver", liverGeo, "digestive", 0xff945c, 0x8c362e, 5);
+
+  const gbGeo = buildTube([[-4.6, -21.4, 3.0], [-5.1, -22.8, 4.3], [-5.4, -23.7, 5.1]],
+    u => 0.32 + 0.88 * Math.sin(Math.pow(u, 0.75) * Math.PI), 12, 8);
+  addT("gallbladder", gbGeo, "digestive", 0x67f2a3, 0x448f5a, 6);
+
+  const stomachGeo = buildTube(
+    [[1.2, -16.0, 0.5], [4.6, -15.4, 1.3], [6.4, -18.6, 2.7], [5.1, -22.2, 3.8], [1.7, -23.3, 3.9], [-1.4, -22.1, 2.8], [-2.6, -23.8, 1.3], [-1.4, -26.2, 0.6]],
+    u => {
+      const r = u < 0.18 ? 0.95 + 1.8 * (u / 0.18)
+        : u < 0.55 ? 2.75 + 0.35 * Math.sin((u - 0.18) / 0.37 * Math.PI)
+        : 2.75 - 1.75 * Math.pow((u - 0.55) / 0.45, 0.85);
+      return [r, r * 0.76];
+    }, 32, 12);
+  addT("stomach", stomachGeo, "digestive", 0xffc46b, 0xcc7b68, 5);
+
+  // 6. Intestines (Haustrated Colon + Coiled Small Intestine)
+  const colonPts = [
+    [-8.4, -34.2, 2.8], [-9.1, -29.8, 2.0], [-8.8, -25.2, 1.8], [-5.8, -24.6, 4.0],
+    [0.0, -26.3, 5.1], [6.2, -24.7, 3.7], [9.2, -23.2, 1.2], [9.1, -28.8, 1.6],
+    [8.2, -34.0, 2.2], [4.8, -36.4, 1.4], [1.2, -35.8, -0.4], [0.0, -39.2, -1.8]
+  ];
+  const colonMain = buildTube(colonPts, u => (1.85 - 0.35 * u) * (1 + 0.15 * Math.sin(u * Math.PI * 36)), 72, 11);
+  const appendix = buildTube([[-8.2, -34.2, 2.8], [-6.8, -35.8, 2.2], [-5.8, -36.4, 1.6]], 0.36, 8, 6);
+  addT("colon", mergeGeos([colonMain, appendix]), "intestines", 0xff9c7a, 0xc4776a, 4);
+
+  const smPts = [];
+  for (let i = 0; i <= 76; i++) {
+    const t = i / 76;
+    const x = 5.6 * Math.sin(t * Math.PI * 7.2) * (0.55 + 0.45 * Math.sin(t * Math.PI));
+    const y = -27.4 - 8.4 * t + 0.85 * Math.cos(t * Math.PI * 14.4);
+    const z = 2.8 + 1.3 * Math.cos(t * Math.PI * 7.2) * Math.sin(t * Math.PI * 3.5);
+    smPts.push([x, y, z]);
+  }
+  addT("smallIntestine", buildTube(smPts, 1.08, 130, 8), "intestines", 0xffd29e, 0xd99b88, 4);
+
+  // 7. Kidneys, Ureters & Spleen
+  const makeKidney = (cx, cy, cz, side) => buildSurf(22, 18, (u, v) => {
+    const th = u * Math.PI * 2, sv = Math.sin(v), cv = Math.cos(v);
+    let lx = 2.15 * sv * Math.cos(th), ly = 4.0 * cv, lz = 1.55 * sv * Math.sin(th);
+    // Hilum indentation on medial side
+    const towardMid = -side * lx;
+    if (towardMid > 0) lx += side * 1.15 * Math.exp(-ly * ly / 5.5) * (towardMid / 2.15);
+    // Slight anatomical tilt
+    const a = side * 0.18;
+    return [cx + lx * Math.cos(a) - ly * Math.sin(a), cy + lx * Math.sin(a) + ly * Math.cos(a), cz + lz];
+  });
+  const kidneyParts = [
+    makeKidney(-5.2, -22.8, -3.4, -1),
+    makeKidney(5.2, -21.4, -3.4, 1),
+    buildTube([[-3.7, -22.8, -3.0], [-2.8, -28.0, -2.5], [-1.7, -37.2, -1.8]], 0.26, 12, 6),
+    buildTube([[3.7, -21.4, -3.0], [2.8, -27.5, -2.5], [1.7, -37.2, -1.8]], 0.26, 12, 6)
+  ];
+  addT("kidneys", mergeGeos(kidneyParts), "kidneys", 0xd48cff, 0x8f3a54, 4);
+
+  const spleenGeo = buildSurf(18, 16, (u, v) => {
+    const th = u * Math.PI * 2, sv = Math.sin(v);
+    return [9.4 + 1.5 * sv * Math.cos(th), -19.0 + 3.1 * Math.cos(v), -1.6 + 2.1 * sv * Math.sin(th)];
+  });
+  addT("spleen", spleenGeo, "kidneys", 0xb88cff, 0x7a2f4b, 4);
+
+  // Torso anatomical labels (x, y, z in torso coordinates)
+  torsoLabels.push(
+    { t: "Clavicle", layer: "ribs", pts: [[-9.5, 1.8, 4.4], [9.5, 1.8, 4.4]] },
+    { t: "Sternum", layer: "ribs", pts: [[0, -6.5, 7.5]] },
+    { t: "Ribcage", layer: "ribs", pts: [[-13.5, -10.5, 2.0], [13.5, -10.5, 2.0]] },
+    { t: "Spine", layer: "ribs", pts: [[0, -18.0, -6.8]] },
+    { t: "Trachea", layer: "lungs", pts: [[0, 1.5, 1.6]] },
+    { t: "Right lung", layer: "lungs", pts: [[-8.2, -9.0, 2.0]] },
+    { t: "Left lung", layer: "lungs", pts: [[8.2, -8.5, 2.0]] },
+    { t: "Bronchi", layer: "lungs", pts: [[-5.2, -9.4, 0.8], [5.4, -9.5, 0.7]] },
+    { t: "Heart", layer: "heart", pts: [[3.2, -11.5, 4.6]] },
+    { t: "Aortic arch", layer: "heart", pts: [[2.2, -4.0, 1.4]] },
+    { t: "Superior vena cava", layer: "heart", pts: [[-2.1, -5.2, 1.8]] },
+    { t: "Liver", layer: "digestive", pts: [[-6.5, -18.5, 4.2]] },
+    { t: "Gallbladder", layer: "digestive", pts: [[-5.3, -23.3, 5.0]] },
+    { t: "Stomach", layer: "digestive", pts: [[5.5, -19.8, 3.8]] },
+    { t: "Large intestine", layer: "intestines", pts: [[-8.8, -29.0, 2.4], [8.8, -29.0, 2.4]] },
+    { t: "Small intestine", layer: "intestines", pts: [[0.5, -31.5, 4.2]] },
+    { t: "Right kidney", layer: "kidneys", pts: [[-5.5, -22.8, -3.2]] },
+    { t: "Left kidney", layer: "kidneys", pts: [[5.5, -21.4, -3.2]] },
+    { t: "Spleen", layer: "kidneys", pts: [[9.6, -19.0, -1.2]] }
+  );
+}
+
+const torso = { found: false, pos: null, quat: null, scl: null, yaw: 0, roll: 0, pitch: 0, autoY: 1, spanPx: 0, lms: null };
+let tPos, tQuat, tScl, tEul, tFitM, tMat;
+function initTorsoMath() {
+  tPos = new THREE.Vector3(); tQuat = new THREE.Quaternion(); tScl = new THREE.Vector3(1, 1, 1);
+  tEul = new THREE.Euler(0, 0, 0, "YXZ"); tFitM = new THREE.Matrix4(); tMat = new THREE.Matrix4();
+  torso.pos = new THREE.Vector3(); torso.quat = new THREE.Quaternion(); torso.scl = new THREE.Vector3(1, 1, 1);
+}
+
+function updateTorsoPose(lms, worldLms) {
+  const L = lms && lms[11], R = lms && lms[12];
+  if (!L || !R) return false;
+  const visOk = (L.visibility === undefined || L.visibility > 0.3) && (R.visibility === undefined || R.visibility > 0.3);
+  if (!visOk) return false;
+
+  const dx = (L.x - R.x) * W, dy = (L.y - R.y) * H;
+  const span2D = Math.hypot(dx, dy);
+  if (span2D < 24) return false;
+
+  let yaw = 0, pitch = 0;
+  const wL = worldLms && worldLms[11], wR = worldLms && worldLms[12];
+  if (wL && wR) {
+    const wdx = wL.x - wR.x, wdy = wL.y - wR.y, wdz = wL.z - wR.z;
+    const wSpan = Math.hypot(wdx, wdy, wdz) || 1;
+    yaw = Math.asin(Math.max(-0.82, Math.min(0.82, wdz / wSpan)));
+  }
+  const roll = -Math.atan2(dy, dx);
+  const cosYaw = Math.max(0.55, Math.cos(yaw));
+  const span3D = span2D / cosYaw;
+
+  // Blend vertical torso proportion when hips (23, 24) are clearly visible in frame
+  let targetAutoY = 1.0;
+  const LH = lms[23], RH = lms[24];
+  if (LH && RH && (LH.visibility || 0) > 0.5 && (RH.visibility || 0) > 0.5 && LH.y < 1.05 && RH.y < 1.05) {
+    const hmx = (LH.x + RH.x) * 0.5, hmy = (LH.y + RH.y) * 0.5;
+    const smx = (L.x + R.x) * 0.5, smy = (L.y + R.y) * 0.5;
+    const obsLen = Math.hypot((smx - hmx) * W, (smy - hmy) * H);
+    if (obsLen > span3D * 0.6) targetAutoY = Math.max(0.84, Math.min(1.22, obsLen / (span3D * 1.24)));
+    if (worldLms && worldLms[23] && worldLms[24]) {
+      const wShZ = (wL.z + wR.z) * 0.5, wShY = (wL.y + wR.y) * 0.5;
+      const wHpZ = (worldLms[23].z + worldLms[24].z) * 0.5, wHpY = (worldLms[23].y + worldLms[24].y) * 0.5;
+      const dwy = wHpY - wShY, dwz = wHpZ - wShZ;
+      if (dwy > 0.15) pitch = Math.max(-0.42, Math.min(0.42, Math.atan2(dwz, dwy)));
+    }
+  }
+
+  const tanHalf = Math.tan(63 * Math.PI / 360);
+  const D = (36 * H) / (2 * span3D * tanHalf);
+  const mx = (L.x + R.x) * 0.5, my = (L.y + R.y) * 0.5;
+  const halfH = D * tanHalf, halfW = halfH * (W / H);
+  tPos.set((mx * 2 - 1) * halfW, (1 - my * 2) * halfH, -D);
+  tEul.set(pitch, yaw, roll, "YXZ");
+  tQuat.setFromEuler(tEul);
+
+  if (!torso.found) {
+    torso.pos.copy(tPos); torso.quat.copy(tQuat); torso.autoY = targetAutoY;
+    torso.yaw = yaw; torso.roll = roll; torso.pitch = pitch;
+  } else {
+    torso.pos.lerp(tPos, 0.45); torso.quat.slerp(tQuat, 0.4);
+    torso.autoY += (targetAutoY - torso.autoY) * 0.25;
+    torso.yaw += (yaw - torso.yaw) * 0.4; torso.roll += (roll - torso.roll) * 0.4; torso.pitch += (pitch - torso.pitch) * 0.35;
+  }
+  torso.found = true; torso.spanPx = span3D; torso.lms = lms;
+
+  tMat.compose(torso.pos, torso.quat, tScl.set(1, 1, 1));
+  tFitM.makeScale(S.bs * S.bw, S.bs * S.bh * torso.autoY, S.bs * (S.bw + S.bh) * 0.5).setPosition(0, S.by, 0);
+  torsoGroup.matrix.copy(tMat).multiply(tFitM);
+  torsoGroup.matrixWorldNeedsUpdate = true;
+  torsoGroup.visible = true;
+  return true;
 }
 
 // ------------------------------ hands ------------------------------
@@ -480,12 +976,16 @@ function drawHandVeil(g, lms, alpha) {
 }
 
 // ------------------------------ labels ------------------------------
-const LABEL_COLOR = { skull: "#d9f0ff", brain: "#ffc2d6", muscles: "#ffb3aa", eyes: "#fff3a8", hands: "#d9f0ff" };
+const LABEL_COLOR = {
+  skull: "#d9f0ff", brain: "#ffc2d6", muscles: "#ffb3aa", eyes: "#fff3a8", hands: "#d9f0ff",
+  ribs: "#d0e7ff", heart: "#ff99ad", lungs: "#a6f2ff", digestive: "#ffc299", intestines: "#ffe0bd", kidneys: "#e2b8ff"
+};
 const HEAD_C = [0, 3.2, -4.8];                    // rough centre of the head, in head coordinates (cm)
+const TORSO_C = [0, -17.5, 0.5];                  // rough centre of the torso, in torso coordinates (cm)
 const labelState = {};                            // text -> { side, y } so labels glide instead of jumping
 let lp, ln, lc;
-function toScreen(v) {                            // head/view-space point -> heads-up layer pixels (mirrored like the picture)
-  lc.copy(v).applyMatrix4(cam.projectionMatrix);
+function toScreen(v, proj = cam.projectionMatrix) {  // view-space point -> heads-up layer pixels (mirrored like the picture)
+  lc.copy(v).applyMatrix4(proj);
   return { x: W - (lc.x + 1) / 2 * W, y: (1 - lc.y) / 2 * H };
 }
 function collectHeadLabels(lens) {
@@ -503,6 +1003,28 @@ function collectHeadLabels(lens) {
       const facing = -(ln.x * lp.x + ln.y * lp.y + ln.z * lp.z) / (lp.length() || 1);
       if (solid && facing < 0.12) continue;                                                // on the far side
       const s = toScreen(lp);
+      if (lens && Math.hypot(s.x - lens.x, s.y - lens.y) > lens.r) continue;
+      if (!best || facing > best.facing) best = { text: L.t, color: LABEL_COLOR[L.layer], ax: s.x, ay: s.y, facing };
+    }
+    if (best) out.push(best);
+  }
+  return out;
+}
+function collectTorsoLabels(lens) {
+  const out = [], solid = S.style === "solid", M = torsoGroup.matrix;
+  for (const L of torsoLabels) {
+    if (!S[L.layer]) continue;
+    let best = null;
+    for (const p of L.pts) {
+      lp.fromArray(p);
+      if (torsoClipState.on && torsoClipState.x * lp.x + torsoClipState.y * lp.y < torsoClipState.w) continue;
+      ln.set(lp.x - TORSO_C[0], lp.y - TORSO_C[1], lp.z - TORSO_C[2]).transformDirection(M);
+      lp.applyMatrix4(M);
+      if (lp.z >= -5) continue;
+      const facing = -(ln.x * lp.x + ln.y * lp.y + ln.z * lp.z) / (lp.length() || 1);
+      if (solid && (L.layer === "kidneys" || L.t === "Spine") && facing < 0.05) continue;
+      const s = toScreen(lp, torsoCam.projectionMatrix);
+      if (s.y < 14 || s.y > H - 14 || s.x < 8 || s.x > W - 8) continue;
       if (lens && Math.hypot(s.x - lens.x, s.y - lens.y) > lens.r) continue;
       if (!best || facing > best.facing) best = { text: L.t, color: LABEL_COLOR[L.layer], ax: s.x, ay: s.y, facing };
     }
@@ -541,31 +1063,48 @@ function layoutLabels(g, items, cx, halfWidth, key, splitX) {
     let prev = -1e9;
     for (const it of list) { it.ty = Math.max(it.st.wy, prev + gap); prev = it.ty; }
     const over = prev - (H - 12); if (over > 0) for (const it of list) it.ty -= over;      // keep the stack on screen
-    const tx = side === "left" ? Math.max(8, cx - halfWidth - 22) : Math.min(W - 8, cx + halfWidth + 22);
+    const tx = side === "left" ? Math.max(8, cx - halfWidth - 16) : Math.min(W - 8, cx + halfWidth + 16);
     for (const it of list) {
-      const y = it.ty;
+      const y = it.ty, tw = g.measureText(it.text).width;
+      let drawX = tx, align = side === "left" ? "right" : "left";
+      let lineX = tx + (side === "left" ? 5 : -5);
+      if (side === "right" && tx + tw > W - 8) { drawX = W - 8; align = "right"; lineX = drawX - tw - 5; }
+      else if (side === "left" && tx - tw < 8) { drawX = 8; align = "left"; lineX = drawX + tw + 5; }
       g.strokeStyle = it.color; g.globalAlpha = 0.75; g.lineWidth = 1;
-      g.beginPath(); g.moveTo(it.ax, it.ay); g.lineTo(tx + (side === "left" ? 5 : -5), y); g.stroke();
+      g.beginPath(); g.moveTo(it.ax, it.ay); g.lineTo(lineX, y); g.stroke();
       g.globalAlpha = 1; g.fillStyle = it.color; g.beginPath(); g.arc(it.ax, it.ay, 2.6, 0, 6.3); g.fill();
-      g.textAlign = side === "left" ? "right" : "left";
-      g.strokeStyle = "rgba(4,7,13,.9)"; g.lineWidth = 3.5; g.strokeText(it.text, tx, y);
-      g.fillText(it.text, tx, y);
+      g.textAlign = align;
+      g.strokeStyle = "rgba(4,7,13,.9)"; g.lineWidth = 3.5; g.strokeText(it.text, drawX, y);
+      g.fillText(it.text, drawX, y);
     }
   }
 }
-let frameNo = 0, headSplit = 0;
+let frameNo = 0, headSplit = null, torsoSplit = null;
 function drawLabels(g, lens) {
   frameNo++;
   let hx = W / 2, halfW = W * 0.16;
-  if (head.found && headGroup.visible) {
+  if (head.found && headGroup.visible && (S.skull || S.brain || S.muscles || S.eyes)) {
     lp.fromArray(HEAD_C).applyMatrix4(headGroup.matrix);
     const c = toScreen(lp); lp.x += 10.5 * S.fs * S.fw; const e = toScreen(lp);
     hx = c.x; halfW = Math.abs(e.x - c.x);
     const items = collectHeadLabels(lens);
     // when the head is turned most points sit on one side, so split nearer the middle of the points to balance the columns
     const xs = items.map(it => it.ax).sort((a, b) => a - b), med = xs.length ? xs[xs.length >> 1] : hx;
-    headSplit += ((hx + med) / 2 - headSplit) * 0.2;
+    const targetHS = (hx + med) / 2;
+    headSplit = headSplit === null ? targetHS : headSplit + (targetHS - headSplit) * 0.2;
     layoutLabels(g, items, hx, halfW, "h:", headSplit);
+  }
+  if (torso.found && torsoGroup.visible) {
+    lp.fromArray(TORSO_C).applyMatrix4(torsoGroup.matrix);
+    const tc = toScreen(lp, torsoCam.projectionMatrix);
+    lp.set(TORSO_C[0] + 15.5 * S.bs * S.bw, TORSO_C[1], TORSO_C[2]).applyMatrix4(torsoGroup.matrix);
+    const te = toScreen(lp, torsoCam.projectionMatrix);
+    const tx = tc.x, tHalfW = Math.abs(te.x - tc.x);
+    const tItems = collectTorsoLabels(lens);
+    const txs = tItems.map(it => it.ax).sort((a, b) => a - b), tMed = txs.length ? txs[txs.length >> 1] : tx;
+    const targetTS = (tx + tMed) / 2;
+    torsoSplit = torsoSplit === null ? targetTS : torsoSplit + (targetTS - torsoSplit) * 0.2;
+    layoutLabels(g, tItems, tx, tHalfW, "t:", torsoSplit);
   }
   if (S.hands) handRigs.forEach((rig, i) => {
     if (!rig.group.visible || !rig.pts) return;
@@ -575,7 +1114,7 @@ function drawLabels(g, lens) {
       .map(([text, a, b, k]) => Object.assign({ text, color: LABEL_COLOR.hands }, at(a, b, k)))
       .filter(it => !lens || Math.hypot(it.ax - lens.x, it.ay - lens.y) <= lens.r);
     let lo = 1e9, hi = -1e9; for (const p of P) { lo = Math.min(lo, W - p.x); hi = Math.max(hi, W - p.x); }
-    // put all of a hand's labels on its outer side, away from the head
+    // put all of a hand's labels on its outer side, away from the body
     const mid = (lo + hi) / 2, outerRight = mid > hx, far = outerRight ? lo - 1e4 : hi + 1e4;
     layoutLabels(g, items, far, outerRight ? hi - far : far - lo, "hand" + i + ":");
   });
@@ -586,7 +1125,7 @@ let pointer = null, frames = 0, fps = 0, fpsAt = 0, dataAt = 0;
 stage.addEventListener("pointermove", e => { const r = stage.getBoundingClientRect(); pointer = { x: e.clientX - r.left, y: e.clientY - r.top }; });
 stage.addEventListener("pointerleave", () => { pointer = null; });
 
-function renderFrame(now, faceLms, hands, sides) {
+function renderFrame(now, faceLms, hands, sides, poseLms) {
   // hands
   const sg = $("shade").getContext("2d"); sg.clearRect(0, 0, W, H);
   handRigs.forEach((rig, i) => {
@@ -599,6 +1138,17 @@ function renderFrame(now, faceLms, hands, sides) {
     } else rig.group.visible = false;
   });
   if (!head.found) headGroup.visible = false;
+  if (!torso.found) torsoGroup.visible = false;
+
+  // subtle physiological motion: ~72 bpm heartbeat & ~15/min breathing
+  if (torsoGroup.visible) {
+    const sec = now * 0.001;
+    const beatPhase = (sec * 1.2) % 1;
+    const pulse = Math.exp(-Math.pow((beatPhase - 0.14) * 14, 2)) + 0.45 * Math.exp(-Math.pow((beatPhase - 0.30) * 16, 2));
+    heartPivot.scale.setScalar(1 + 0.032 * pulse);
+    const breath = 0.5 - 0.5 * Math.cos(sec * 1.57);
+    breathGroup.scale.set(1 + 0.018 * breath, 1 + 0.012 * breath, 1 + 0.024 * breath);
+  }
   applyLayers();
 
   // x-ray lens: a round window; outside it you see the plain camera picture
@@ -609,13 +1159,18 @@ function renderFrame(now, faceLms, hands, sides) {
     if (hands[0]) { cx = hands[0][8].x * W; cy = hands[0][8].y * H; }
     else if (pointer) { cx = W - pointer.x; cy = pointer.y; }
     else if (faceLms) { cx = faceLms[1].x * W; cy = faceLms[1].y * H; }
-    else { cx = W / 2; cy = H / 2; }
+    else if (poseLms && poseLms[11] && poseLms[12]) {
+      cx = (poseLms[11].x + poseLms[12].x) * 0.5 * W;
+      cy = Math.min(0.92, (poseLms[11].y + poseLms[12].y) * 0.5 + 0.14) * H;
+    } else { cx = W / 2; cy = H / 2; }
     mask = "radial-gradient(circle " + rad.toFixed(1) + "px at " + cx.toFixed(1) + "px " + cy.toFixed(1) + "px, #000 " + (98 - 78 * S.feather).toFixed(0) + "%, transparent 100%)";
     lens = { x: W - cx, y: cy, r: rad };
   }
   for (const id of ["gl", "shade"]) { const st = $(id).style; st.maskImage = mask; st.webkitMaskImage = mask; }
 
   renderer.clear();
+  renderer.render(torsoScene, torsoCam);
+  renderer.clearDepth();
   renderer.render(headScene, cam);
   renderer.clearDepth();
   renderer.render(handScene, ortho);
@@ -626,6 +1181,18 @@ function renderFrame(now, faceLms, hands, sides) {
   if (S.labels) drawLabels(g, lens);
   if (S.showdata) {
     if (faceLms) { g.fillStyle = "rgba(127,255,170,.85)"; for (const p of faceLms) g.fillRect((1 - p.x) * W - 1, p.y * H - 1, 2, 2); }
+    if (poseLms) {
+      g.strokeStyle = "rgba(127,209,255,.8)"; g.fillStyle = "#7fd1ff"; g.lineWidth = 2;
+      for (const [a, b] of [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24]]) {
+        const pa = poseLms[a], pb = poseLms[b];
+        if (!pa || !pb || (pa.visibility !== undefined && pa.visibility < 0.25) || (pb.visibility !== undefined && pb.visibility < 0.25)) continue;
+        g.beginPath(); g.moveTo((1 - pa.x) * W, pa.y * H); g.lineTo((1 - pb.x) * W, pb.y * H); g.stroke();
+      }
+      for (const i of [11, 12, 13, 14, 15, 16, 23, 24]) {
+        const p = poseLms[i]; if (!p || (p.visibility !== undefined && p.visibility < 0.25)) continue;
+        g.beginPath(); g.arc((1 - p.x) * W, p.y * H, 3.5, 0, 6.3); g.fill();
+      }
+    }
     g.strokeStyle = "rgba(255,183,3,.9)"; g.fillStyle = "#ffb703"; g.lineWidth = 1.5;
     for (const lms of hands) {
       for (const c of [[0,1,2,3,4],[0,5,6,7,8],[5,9,10,11,12],[9,13,14,15,16],[13,17,18,19,20],[0,17]]) {
@@ -636,14 +1203,19 @@ function renderFrame(now, faceLms, hands, sides) {
     if (now - dataAt > 120) {
       dataAt = now;
       const pad = k => (k + "                  ").slice(0, 18), rows = [];
+      const deg = r => (r * 57.2958).toFixed(0) + "°";
       if (head.found) {
-        const eu = new THREE.Euler().setFromQuaternion(head.quat, "YXZ"), deg = r => (r * 57.2958).toFixed(0) + "°";
+        const eu = new THREE.Euler().setFromQuaternion(head.quat, "YXZ");
         rows.push(["face", "tracked, " + (faceLms ? faceLms.length : 0) + " points"],
-                  ["distance", (-head.pos.z).toFixed(0) + " cm (estimate)"],
+                  ["head distance", (-head.pos.z).toFixed(0) + " cm (estimate)"],
                   ["turn / nod / tilt", deg(eu.y) + " / " + deg(eu.x) + " / " + deg(eu.z)],
-                  ["jaw open", head.jaw.toFixed(2)],
-                  ["screen fit", "scale " + head.fitS.toFixed(3) + ", shift " + head.fitX.toFixed(3) + ", " + head.fitY.toFixed(3)]);
+                  ["jaw open", head.jaw.toFixed(2)]);
       } else rows.push(["face", "not found"]);
+      if (torso.found) {
+        rows.push(["body", "tracked, " + Math.round(torso.spanPx) + " px shoulders"],
+                  ["body distance", (-torso.pos.z).toFixed(0) + " cm (estimate)"],
+                  ["body turn / tilt", deg(torso.yaw) + " / " + deg(torso.roll)]);
+      } else rows.push(["body", "not found"]);
       rows.push(["hands", hands.length ? hands.map((h, i) => sides[i] ? "right" : "left").join(" + ") : "none"]);
       if (hands[0]) rows.push(["index fingertip", (1 - hands[0][8].x).toFixed(2) + ", " + hands[0][8].y.toFixed(2)]);
       rows.push(["layers", LAYERS.filter(k => S[k]).join(", ") || "none"], ["speed", fps + " frames/s"]);
@@ -655,7 +1227,7 @@ function renderFrame(now, faceLms, hands, sides) {
 }
 
 // ------------------------------ start-up ------------------------------
-let faceTracker = null, handTracker = null;
+let faceTracker = null, handTracker = null, poseTracker = null;
 async function loadTrackers() {
   const vision = await import(MP + "/vision_bundle.mjs");
   const files = await vision.FilesetResolver.forVisionTasks(MP + "/wasm");
@@ -663,30 +1235,45 @@ async function loadTrackers() {
     runningMode: "VIDEO", numFaces: 1, outputFacialTransformationMatrixes: true, outputFaceBlendshapes: true });
   const mkHand = d => vision.HandLandmarker.createFromOptions(files, { baseOptions: { modelAssetPath: HAND_MODEL, delegate: d },
     runningMode: "VIDEO", numHands: 2 });
+  const mkPose = d => vision.PoseLandmarker.createFromOptions(files, { baseOptions: { modelAssetPath: POSE_MODEL, delegate: d },
+    runningMode: "VIDEO", numPoses: 1 });
   try { faceTracker = await mkFace("GPU"); } catch (e) { faceTracker = await mkFace("CPU"); }
   try { try { handTracker = await mkHand("GPU"); } catch (e) { handTracker = await mkHand("CPU"); } }
-  catch (e) { handTracker = null; }                        // the head view still works without hand tracking
+  catch (e) { handTracker = null; }                        // head & body views still work without hand tracking
+  try { try { poseTracker = await mkPose("GPU"); } catch (e) { poseTracker = await mkPose("CPU"); } }
+  catch (e) { poseTracker = null; }                        // head & hand views still work without body pose tracking
 }
 
 function liveLoop() {
-  let lastTime = -1, lostAt = 0, said = "";
+  let lastTime = -1, lostAt = 0, torsoLostAt = 0, said = "";
   const say = (t, c) => { if (said !== t) { said = t; setStatus(t, c); } };
   function tick() {
     requestAnimationFrame(tick);
     if (video.readyState < 2 || video.currentTime === lastTime) return;
     lastTime = video.currentTime;
     const now = performance.now();
-    let faceLms = null, hands = [], sides = [];
+    let faceLms = null, hands = [], sides = [], poseLms = null;
     try {
-      const fr = faceTracker.detectForVideo(video, now);
-      faceLms = fr.faceLandmarks && fr.faceLandmarks[0];
-      const mat = fr.facialTransformationMatrixes && fr.facialTransformationMatrixes[0];
-      if (faceLms && mat) {
-        let jaw = 0;
-        const bs = fr.faceBlendshapes && fr.faceBlendshapes[0];
-        if (bs) for (const c of bs.categories) if (c.categoryName === "jawOpen") jaw = c.score;
-        updateHead(mat.data, faceLms, jaw); lostAt = 0;
-      } else { faceLms = null; if (!lostAt) lostAt = now; if (now - lostAt > 250) head.found = false; }
+      if (HEAD_LAYERS.some(k => S[k]) || S.showdata || S.reveal === "lens") {
+        const fr = faceTracker.detectForVideo(video, now);
+        faceLms = fr.faceLandmarks && fr.faceLandmarks[0];
+        const mat = fr.facialTransformationMatrixes && fr.facialTransformationMatrixes[0];
+        if (faceLms && mat) {
+          let jaw = 0;
+          const bs = fr.faceBlendshapes && fr.faceBlendshapes[0];
+          if (bs) for (const c of bs.categories) if (c.categoryName === "jawOpen") jaw = c.score;
+          updateHead(mat.data, faceLms, jaw); lostAt = 0;
+        } else { faceLms = null; if (!lostAt) lostAt = now; if (now - lostAt > 250) head.found = false; }
+      } else head.found = false;
+
+      if (poseTracker && (TORSO_LAYERS.some(k => S[k]) || S.showdata)) {
+        const pr = poseTracker.detectForVideo(video, now);
+        poseLms = pr.landmarks && pr.landmarks[0];
+        const wLms = pr.worldLandmarks && pr.worldLandmarks[0];
+        if (poseLms && updateTorsoPose(poseLms, wLms)) torsoLostAt = 0;
+        else { if (!torsoLostAt) torsoLostAt = now; if (now - torsoLostAt > 250) torso.found = false; }
+      } else torso.found = false;
+
       if (handTracker && (S.hands || S.reveal === "lens" || S.showdata)) {
         const hr = handTracker.detectForVideo(video, now);
         hands = hr.landmarks || [];
@@ -695,31 +1282,52 @@ function liveLoop() {
         sides = hands.map((h, i) => !!(hd[i] && hd[i][0] && hd[i][0].categoryName === "Left"));
       }
     } catch (e) { say("The tracker hit an error: " + e.message, "bad"); return; }
-    say(head.found ? "Tracking your head." + (hands.length ? " Hand bones on." : "")
-                   : hands.length ? "Hand found. Face the camera to see inside your head."
-                   : "No face found. Face the camera, with light on your face.", head.found || hands.length ? "ok" : "bad");
-    renderFrame(now, faceLms, hands, sides);
+    const msg = head.found && torso.found ? "Tracking head & body organs."
+              : torso.found ? "Tracking your body organs."
+              : head.found ? "Tracking your head."
+              : hands.length ? "Hand found. Show your face or shoulders to scan inside."
+              : "No person found. Face the camera or show your shoulders.";
+    say(msg + (hands.length && (head.found || torso.found) ? " Hand bones on." : ""),
+        head.found || torso.found || hands.length ? "ok" : "bad");
+    renderFrame(now, faceLms, hands, sides, poseLms);
   }
   tick();
 }
 
-// Built-in test scene (open the page with #demo): a pretend head and the dataset's own hand, no camera.
+// Built-in test scene (open the page with #demo): pretend head, internal body organs, and hand, no camera.
 function demoLoop() {
   $("intro").hidden = true;
   setStatus("Demo scene (no camera).", "ok");
   const params = new URLSearchParams(location.search), still = params.has("still");
+  if (params.has("solid")) { S.style = "solid"; syncUI(); applyStyle(); }
+  if (params.has("labels")) { S.labels = true; syncUI(); }
+  if (params.has("organs")) { for (const k of HEAD_LAYERS) S[k] = false; syncUI(); }
   const base = META.demoHand, cx = base[9][0], cy = base[9][1], cz = base[9][2];
   function tick() {
     if (!still) requestAnimationFrame(tick);
     const now = performance.now(), t = still ? 1.2 : now / 1000;
-    const m = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-0.06 + 0.05 * Math.sin(t * 0.7), 0.42 * Math.sin(t * 0.5 + 0.9), 0.04, "YXZ"));
-    m.setPosition(-5 + 2 * Math.sin(t * 0.4), 1.5, -46);
+    const hx = -6 + 2 * Math.sin(t * 0.4), yaw = 0.36 * Math.sin(t * 0.5 + 0.9);
+    const m = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(-0.04 + 0.04 * Math.sin(t * 0.7), yaw, 0.03, "YXZ"));
+    m.setPosition(hx, 13.5, -66);
     const lms = [];
     for (const id of FIT_IDS) { const v = new THREE.Vector3().fromArray(META.fit[id]).applyMatrix4(m).applyMatrix4(baseProj); lms[id] = { x: (v.x + 1) / 2, y: (1 - v.y) / 2, z: 0 }; }
     updateHead(m.elements, lms, 0.5 + 0.5 * Math.sin(t * 1.3));
+
+    const tm = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(0, yaw * 0.55, 0.02 * Math.sin(t * 0.4), "YXZ"));
+    tm.setPosition(hx, -1.0, -66);
+    const projP = (p) => { const v = new THREE.Vector3(p[0], p[1], p[2]).applyMatrix4(tm).applyMatrix4(torsoCam.projectionMatrix); return { x: (v.x + 1) / 2, y: (1 - v.y) / 2, z: 0, visibility: 1 }; };
+    const poseLms = [], worldLms = [];
+    poseLms[11] = projP([18, 0, 0]); poseLms[12] = projP([-18, 0, 0]);
+    poseLms[23] = projP([14, -44, 0]); poseLms[24] = projP([-14, -44, 0]);
+    const wRot = new THREE.Matrix4().makeRotationY(yaw * 0.55);
+    const wPt = (x, y, z) => { const v = new THREE.Vector3(x, y, z).applyMatrix4(wRot); return { x: v.x, y: v.y, z: v.z }; };
+    worldLms[11] = wPt(0.18, -0.22, 0); worldLms[12] = wPt(-0.18, -0.22, 0);
+    worldLms[23] = wPt(0.14, 0.22, 0);  worldLms[24] = wPt(-0.14, 0.22, 0);
+    updateTorsoPose(poseLms, worldLms);
+
     // the dataset's right hand, fingers pointing up, palm to the camera, placed at the side of the picture
-    const k = 0.0021 * H / W * (4 / 3), hand = base.map(p => ({ x: 0.2 - (p[0] - cx) * k, y: 0.56 + (p[2] - cz) * k * W / H, z: (p[1] - cy) * k }));
-    renderFrame(now, FIT_IDS.map(id => lms[id]), [hand], [true]);
+    const k = 0.0021 * H / W * (4 / 3), hand = base.map(p => ({ x: 0.24 - (p[0] - cx) * k, y: 0.56 + (p[2] - cz) * k * W / H, z: (p[1] - cy) * k }));
+    renderFrame(now, FIT_IDS.map(id => lms[id]), [hand], [true], poseLms);
     if (params.has("dump") && now > 1500 && !demoLoop.dumped) {      // flatten the layers into one picture for testing
       demoLoop.dumped = true;
       const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d");
@@ -737,7 +1345,7 @@ function demoLoop() {
 
 async function boot() {
   THREE = await import(DEMO && new URLSearchParams(location.search).get("three") || THREE_URL);
-  initMath(); initHandMath(); buildScene();
+  initMath(); initTorsoMath(); initHandMath(); buildScene();
 }
 
 $("start").onclick = async () => {
@@ -757,9 +1365,10 @@ $("start").onclick = async () => {
     setStatus("Loading the 3D anatomy…");
     await boot();
     stageName = "trackers";
-    setStatus("Loading the face and hand trackers (first time takes a few seconds)…");
+    setStatus("Loading the face, body and hand trackers (first time takes a few seconds)…");
     await loadTrackers();
     if (!handTracker) $("L_hands").disabled = true;
+    if (!poseTracker) for (const k of TORSO_LAYERS) $("L_" + k).disabled = true;
     resize();
     liveLoop();
   } catch (err) {

@@ -1,25 +1,26 @@
 # Scan Human Education — X-Ray Mirror (`scan-human`)
 
-An interactive browser-based **X-Ray Mirror** that overlays real-time 3D head anatomy (skull, brain, facial muscles, eyes) and hand bones onto your live webcam feed using Three.js and MediaPipe.
+An interactive browser-based **X-Ray Mirror** that overlays real-time 3D head anatomy (skull, brain, facial muscles, eyes), internal body organs (ribcage, spine, heart, lungs, liver, stomach, intestines, kidneys), and hand bones onto your live webcam feed using Three.js and MediaPipe.
 
 - **Live Demo**: https://chusni-moklet.github.io/scan-human/
 - **No-Camera Demo**: https://chusni-moklet.github.io/scan-human/#demo
 
 ## Features
 
-- **Real-Time Face & Hand Tracking**: Tracks head pose, jaw movement, and up to two hands locally in the browser using MediaPipe `FaceLandmarker` and `HandLandmarker`.
+- **Real-Time Face, Body & Hand Tracking**: Tracks head pose, jaw movement, upper-body/torso pose, and up to two hands locally in the browser using MediaPipe `FaceLandmarker`, `PoseLandmarker`, and `HandLandmarker`.
 - **Anatomy Layers & Presets**:
-  - Toggle individual layers: **Skull** (cranium & articulated mandible), **Brain** (cerebrum & hindbrain), **Muscles**, **Eyes**, **Head outline**, and **Hand bones**.
-  - Quick presets for **Skull**, **Brain**, **Muscles**, or **Everything**.
-  - Toggleable **3D Anatomy Labels** for bones, brain lobes, muscles, eyes, and hand phalanges/metacarpals/carpals.
+  - **Head & Hands**: **Skull** (cranium & articulated mandible), **Brain** (cerebrum & hindbrain), **Muscles**, **Eyes**, **Head outline**, and **Hand bones**.
+  - **Body & Internal Organs**: **Ribs & spine** (clavicles, sternum, 12 rib pairs, thoracic/lumbar vertebrae), **Heart** (with aortic arch, superior vena cava, pulmonary trunk, and subtle pulse), **Lungs & airway** (trachea, bronchial tree, and breathing lungs), **Liver & stomach** (with gallbladder), **Intestines** (colon & coiled small intestine), **Kidneys** (with ureters & spleen), and **Body outline**.
+  - Quick presets for **Skull**, **Brain**, **Muscles**, **Body organs**, **Chest**, or **Everything**.
+  - Toggleable **3D Anatomy Labels** for head bones, internal organs, and hand bones.
 - **Visual Styles & Mixed Reality Controls**:
   - Switch between **X-ray** (additive glowing shader) and **Solid** (lit surface) look with adjustable **Brightness**.
   - Blend camera feed visibility (**Real me showing through**) and **Edge feather** softness.
-  - **Reveal modes**: Whole head, Left half only, Right half only, Top of the head only, Lower face only, or **X-ray lens** (circular lens following your index fingertip or pointer).
-- **Manual Head Fit & Diagnostics**:
-  - Fine-tune overall size, width, height, depth, and X/Y/Z offsets (persisted in `localStorage`).
-  - Optional live tracking data panel (face landmarks, estimated distance, head rotation, jaw openness, hand coordinates, and FPS).
-- **No-Camera Demo Mode**: Append `#demo` to the URL to preview the 3D head and hand scene without a webcam.
+  - **Reveal modes**: Whole body, Left half only, Right half only, Upper half only, Lower half only, or **X-ray lens** (circular lens following your index fingertip or pointer).
+- **Manual Body & Head Fit + Diagnostics**:
+  - Fine-tune body size, chest width, torso length, and vertical offset, plus head size/aspect/offset controls (persisted in `localStorage`).
+  - Optional live tracking data panel (face, body pose, hand coordinates, and FPS).
+- **No-Camera Demo Mode**: Append `#demo` to the URL to preview the 3D head, internal body organs, and hand scene without a webcam.
 
 ## Running Locally
 
@@ -48,5 +49,5 @@ Then open `http://localhost:8000` in Chrome or Edge (or `http://localhost:8000/#
 
 ## Credits
 
-- **Anatomy Models**: BodyParts3D, © The Database Center for Life Science, licensed under [CC Attribution-Share Alike 2.1 Japan](https://creativecommons.org/licenses/by-sa/2.1/jp/). Models were simplified and re-aligned.
+- **Anatomy Models**: Head & hand models from BodyParts3D, © The Database Center for Life Science, licensed under [CC Attribution-Share Alike 2.1 Japan](https://creativecommons.org/licenses/by-sa/2.1/jp/) (simplified and re-aligned). Internal body organs are procedural 3D anatomical meshes.
 
