@@ -1,6 +1,9 @@
-# X-Ray Mirror (`scan-human`)
+# Scan Human Education — X-Ray Mirror (`scan-human`)
 
 An interactive browser-based **X-Ray Mirror** that overlays real-time 3D head anatomy (skull, brain, facial muscles, eyes) and hand bones onto your live webcam feed using Three.js and MediaPipe.
+
+- **Live Demo**: https://chusni-moklet.github.io/scan-human/
+- **No-Camera Demo**: https://chusni-moklet.github.io/scan-human/#demo
 
 ## Features
 
