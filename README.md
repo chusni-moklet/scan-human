@@ -46,3 +46,4 @@ Then open `http://localhost:8000` in Chrome or Edge (or `http://localhost:8000/#
 ## Credits
 
 - **Anatomy Models**: BodyParts3D, © The Database Center for Life Science, licensed under [CC Attribution-Share Alike 2.1 Japan](https://creativecommons.org/licenses/by-sa/2.1/jp/). Models were simplified and re-aligned.
+
